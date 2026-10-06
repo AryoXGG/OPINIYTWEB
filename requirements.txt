@@ -1,0 +1,8 @@
+streamlit>=1.32
+pandas>=1.5
+scikit-learn>=1.2
+xgboost>=1.7
+nltk>=3.8
+Sastrawi>=1.0.1
+matplotlib>=3.6
+joblib>=1.2
