@@ -33,9 +33,9 @@ div.stButton > button[kind="primary"] { background: linear-gradient(90deg, #1f38
     border: none; border-radius: 10px; padding: .55rem 1.6rem; font-weight: 600; }
 div.stButton > button { border-radius: 10px; }
 .result-card { background: #f0f7f2; border-left: 6px solid #2ca02c; border-radius: 12px;
-               padding: 16px 20px; margin: 12px 0; }
-.result-card.neg { background: #fdf0f0; border-left-color: #d62728; }
-.result-card.neu { background: #eef4fb; border-left-color: #1f77b4; }
+               padding: 16px 20px; margin: 12px 0; color: #14532d; font-size: 1.05rem; }
+.result-card.neg { background: #fdf0f0; border-left-color: #d62728; color: #7f1d1d; }
+.result-card.neu { background: #eef4fb; border-left-color: #1f77b4; color: #1e3a5f; }
 .footer { text-align: center; opacity: .6; font-size: .8rem; margin-top: 30px; }
 </style>
 ''', unsafe_allow_html=True)
@@ -112,19 +112,22 @@ INFLUENCER = pd.DataFrame([
 ], columns=['Influencer', 'Positif', 'Netral', 'Negatif', 'Total'])
 CONTOH = {
     'Positif': [
-        'Terima kasih penjelasannya sangat bermanfaat, akhirnya paham bedanya emas fisik dan digital',
-        'Mantap bang, materinya daging semua, lanjutkan bahas reksadana vs saham',
-        'Setuju banget, diversifikasi itu kunci, sukses selalu',
-    ],
-    'Netral': [
-        'Bang spill aplikasi beli emas digital yang aman dong',
-        'Untuk pemula mulai dari reksadana atau emas dulu ya?',
-        'Video ini bahas emas tahun 2024 ya, durasinya berapa menit?',
+        'Wah makasih bang penjelasannya mantap, mencerahkan banget buat orang awam yang baru mau masuk market.',
+        'Bener banget kata lu bang, diversifikasi aset itu penting banget biar porto kita aman kalau market lagi hancur.',
+        'Konten daging semua nih! Selalu nungguin video terbarunya soal money management.',
+        'Setuju 100 persen, pondasi keuangannya emang harus dari dana darurat dulu sebelum mikirin crypto.',
     ],
     'Negatif': [
-        'Tidak setuju, strateginya terlalu berisiko buat gaji UMR',
-        'Kecewa, thumbnail clickbait isinya muter-muter tidak jelas',
-        'Penjelasannya terlalu cepat, pemula kayak saya jadi bingung',
+        'Ah teori doang, prakteknya di market mah susah, gak segampang bacotnya.',
+        'Saham sekarang lagi hancur bang, mending jauhin dulu deh bikin boncos.',
+        'Halah ujung-ujungnya juga jualan kelas VIP, padahal ilmunya gitu-gitu aja.',
+        'Gak setuju, kalau nunggu dana darurat kumpul dulu keburu telat kita ambil momentum di saham.',
+    ],
+    'Netral': [
+        'Bang, kalau bedanya reksadana pasar uang sama pendapatan tetap itu apa ya?',
+        'Next bahas tutorial cara daftar sekuritas di aplikasi dong bang.',
+        'Hadir nyimak videonya dari Surabaya bang.',
+        'Kameranya pakai apa nih bang? Gambarnya jernih banget.',
     ],
 }
 WARNA = {'Positif': '#2ca02c', 'Netral': '#1f77b4', 'Negatif': '#d62728'}
@@ -165,9 +168,11 @@ if menu == '🔮 Prediksi Opini':
             else:
                 st.write('Teks bersih:', f'`{bersih}`')
                 X = art['tfidf'].transform([bersih])
+                LABEL_ID = {'Positive': 'Positif', 'Negative': 'Negatif', 'Neutral': 'Netral'}
                 pred_svm = art['svm'].predict(X)[0]
-                cls = 'neg' if pred_svm == 'Negatif' else ('neu' if pred_svm == 'Netral' else '')
-                st.markdown(f'<div class="result-card {cls}"><b>Hasil model terbaik (SVM): {pred_svm}</b></div>',
+                _ps = LABEL_ID.get(pred_svm, pred_svm)
+                cls = 'neg' if _ps == 'Negatif' else ('neu' if _ps == 'Netral' else '')
+                st.markdown(f'<div class="result-card {cls}"><b>Hasil model terbaik (SVM): {_ps}</b></div>',
                             unsafe_allow_html=True)
                 st.write('Perbandingan kelima model:')
                 hasil = []
@@ -184,8 +189,9 @@ if menu == '🔮 Prediksi Opini':
                         proba = e / e.sum()
                         conf = float(proba[list(m.classes_).index(pred)])
                         if key == 'svm':
-                            svm_dec, svm_cls = dec, list(m.classes_)
-                    hasil.append((nama, pred, round(conf, 4)))
+                            svm_dec = dec
+                            svm_cls = [LABEL_ID.get(c, c) for c in m.classes_]
+                    hasil.append((nama, LABEL_ID.get(pred, pred), round(conf, 4)))
                 df_h = pd.DataFrame(hasil, columns=['Model', 'Prediksi', 'Keyakinan'])
                 st.dataframe(df_h, use_container_width=True)
                 if svm_dec is not None:
