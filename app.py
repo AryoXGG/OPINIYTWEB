@@ -18,6 +18,27 @@ ART = BASE / 'artifacts'
 
 st.set_page_config(page_title='Analisis Opini Influencer Keuangan', page_icon='📊', layout='wide')
 
+st.markdown('''
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+.hero { background: linear-gradient(120deg, #0f2027, #203a43, #2c5364); border-radius: 16px;
+        padding: 28px 32px; color: white; margin-bottom: 18px; }
+.hero h1 { font-size: 1.7rem; font-weight: 800; margin: 0 0 6px 0; }
+.hero p { opacity: .85; margin: 0; font-size: .95rem; }
+section[data-testid="stSidebar"] { background: linear-gradient(180deg, #0f2027, #2c5364); }
+section[data-testid="stSidebar"] * { color: #eef4f7 !important; }
+div.stButton > button[kind="primary"] { background: linear-gradient(90deg, #1f3864, #2c5364);
+    border: none; border-radius: 10px; padding: .55rem 1.6rem; font-weight: 600; }
+div.stButton > button { border-radius: 10px; }
+.result-card { background: #f0f7f2; border-left: 6px solid #2ca02c; border-radius: 12px;
+               padding: 16px 20px; margin: 12px 0; }
+.result-card.neg { background: #fdf0f0; border-left-color: #d62728; }
+.result-card.neu { background: #eef4fb; border-left-color: #1f77b4; }
+.footer { text-align: center; opacity: .6; font-size: .8rem; margin-top: 30px; }
+</style>
+''', unsafe_allow_html=True)
+
 # ---------------- util: artefak ----------------
 @st.cache_resource
 def load_artifacts():
@@ -96,9 +117,12 @@ CONTOH = {
 WARNA = {'Positif': '#2ca02c', 'Netral': '#1f77b4', 'Negatif': '#d62728'}
 
 # ---------------- UI ----------------
-st.title('📊 Analisis Opini Audiens terhadap Influencer Keuangan di YouTube')
-st.caption('Klasifikasi opini komentar (Positif / Negatif / Netral) — Naive Bayes, Logistic Regression, SVM, Random Forest, XGBoost')
+st.markdown('''<div class="hero"><h1>📊 Analisis Opini Audiens terhadap Influencer Keuangan</h1>
+<p>Klasifikasi opini komentar YouTube (Positif · Negatif · Netral) — Naive Bayes · Logistic Regression · SVM · Random Forest · XGBoost</p></div>''',
+    unsafe_allow_html=True)
 menu = st.sidebar.radio('Navigasi', ['🔮 Prediksi Opini', '📈 Dashboard Hasil', 'ℹ️ Metodologi'])
+st.sidebar.markdown('---')
+st.sidebar.caption('Model terbaik: **SVM** (Accuracy 0,7596 · F1 0,7522) · Data uji: 782 komentar')
 
 if menu == '🔮 Prediksi Opini':
     st.header('Prediksi opini komentar')
@@ -128,7 +152,10 @@ if menu == '🔮 Prediksi Opini':
             else:
                 st.write('Teks bersih:', f'`{bersih}`')
                 X = art['tfidf'].transform([bersih])
-                st.subheader('Hasil model terbaik (SVM): **%s**' % art['svm'].predict(X)[0])
+                pred_svm = art['svm'].predict(X)[0]
+                cls = 'neg' if pred_svm == 'Negatif' else ('neu' if pred_svm == 'Netral' else '')
+                st.markdown(f'<div class="result-card {cls}"><b>Hasil model terbaik (SVM): {pred_svm}</b></div>',
+                            unsafe_allow_html=True)
                 st.write('Perbandingan kelima model:')
                 hasil = []
                 svm_dec, svm_cls = None, None
@@ -160,6 +187,11 @@ if menu == '🔮 Prediksi Opini':
 
 elif menu == '📈 Dashboard Hasil':
     st.header('Hasil evaluasi (data uji, 782 komentar)')
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric('Model Terbaik', 'SVM')
+    m2.metric('Accuracy', '0,7596')
+    m3.metric('F1-Score', '0,7521')
+    m4.metric('Data Uji', '782')
     st.dataframe(METRICS, use_container_width=True)
     c1, c2 = st.columns(2)
     with c1:
@@ -198,3 +230,5 @@ else:
 5. **Split**: stratified 80:20 (3.128 latih / 782 uji, `random_state=42`).
 6. **Model**: Naive Bayes, Logistic Regression, SVM, Random Forest, XGBoost — terbaik **SVM** (Accuracy 0,7596; F1 0,7521).
 ''')
+st.markdown('<div class="footer">Skripsi Informatika UISI · Dinunaya Syuja Aryoko (3012210012) · 2026</div>',
+            unsafe_allow_html=True)
