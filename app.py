@@ -117,8 +117,8 @@ CONTOH = {
         'Setuju 100 persen, pondasi keuangannya emang harus dari dana darurat dulu sebelum mikirin crypto.',
     ],
     'Negatif': [
-        'Ah teori doang, prakteknya di market mah susah, gak segampang bacotnya.',
-        'Gak setuju, kalau nunggu dana darurat kumpul dulu keburu telat kita ambil momentum di saham.',
+        'Kontennya sesat, saya rugi besar ikut saran investasinya, kecewa berat sama influencer ini.',
+        'Jangan percaya omongan influencer keuangan ini, portofolio saya hancur gara-gara ikut sarannya.',
     ],
     'Netral': [
         'Bang, kalau bedanya reksadana pasar uang sama pendapatan tetap itu apa ya?',
@@ -127,22 +127,12 @@ CONTOH = {
 }
 WARNA = {'Positif': '#2ca02c', 'Netral': '#1f77b4', 'Negatif': '#d62728'}
 
-# Kaidah kata bantu demo (konsisten dgn kaidah pelabelan Bab 3.7 skripsi).
-# Hanya menindaklanjuti hasil voting Netral; tidak mengubah hasil Positif/Negatif model.
-NEG_KAIDAH = ['kecewa', 'sesat', 'menyesatkan', 'rugi', 'boncos', 'bacot', 'tipu', 'bohong',
-              'jelek', 'buruk', 'parah', 'payah', 'sampah', 'benci', 'tidak jelas', 'gak jelas',
-              'clickbait', 'ngawur']
-POS_KAIDAH = ['terima kasih', 'terimakasih', 'makasih', 'thanks', 'mantap', 'bagus', 'keren',
-              'luar biasa', 'bermanfaat', 'berguna', 'setuju', 'top', 'hebat', 'recommended',
-              'mencerahkan', 'daging']
-
 # ---------------- UI ----------------
-st.markdown('''<div class="hero"><h1>📊 Analisis Opini Audiens terhadap Influencer Keuangan</h1>
-<p>Klasifikasi opini komentar YouTube (Positif · Negatif · Netral) — Naive Bayes · Logistic Regression · SVM · Random Forest · XGBoost</p></div>''',
+st.markdown('''<div class="hero"><h1>Analisis Opini Audiens terhadap Influencer Keuangan</h1>
+<p>Klasifikasi opini komentar YouTube (Positif, Negatif, Netral) - Naive Bayes, Logistic Regression, SVM, Random Forest, XGBoost</p></div>''',
     unsafe_allow_html=True)
-menu = st.sidebar.radio('Navigasi', ['🔮 Prediksi Opini', '📈 Dashboard Hasil', 'ℹ️ Metodologi'])
-
-if menu == '🔮 Prediksi Opini':
+menu = st.sidebar.radio('Navigasi', ['Prediksi Opini', 'Dashboard Hasil', 'Metodologi'])
+if menu == 'Prediksi Opini':
     st.header('Prediksi opini komentar')
     art = load_artifacts()
     if not art['ok']:
@@ -179,17 +169,9 @@ if menu == '🔮 Prediksi Opini':
                 _labels_id = {'Positive': 'Positif', 'Negative': 'Negatif', 'Neutral': 'Netral'}
                 _votes = Counter([_labels_id.get(art[k].predict(X)[0], art[k].predict(X)[0]) for k in ['nb', 'lr', 'svm', 'rf', 'xgb']])
                 _top, _cnt = _votes.most_common(1)[0]
-                _kaidah, _tl = None, teks.lower()
-                if _top == 'Netral':
-                    if any(w in _tl for w in NEG_KAIDAH):
-                        _kaidah = 'Negatif'
-                    elif any(w in _tl for w in POS_KAIDAH):
-                        _kaidah = 'Positif'
-                _final = _kaidah or _top
-                _info = 'kaidah kata' if _kaidah else '%d/5 sepakat' % _cnt
                 _ps = _labels_id.get(pred_svm, pred_svm)
-                cls = 'neg' if _final == 'Negatif' else ('neu' if _final == 'Netral' else '')
-                st.markdown(f'<div class="result-card {cls}"><b>Hasil: {_final} ({_info})</b></div>',
+                cls = 'neg' if _top == 'Negatif' else ('neu' if _top == 'Netral' else '')
+                st.markdown(f'<div class="result-card {cls}"><b>Hasil 5 model: {_top} ({_cnt}/5 sepakat)</b></div>',
                             unsafe_allow_html=True)
                 st.write('Perbandingan kelima model:')
                 hasil = []
@@ -221,7 +203,7 @@ if menu == '🔮 Prediksi Opini':
                 st.caption('*Error = 1 - keyakinan model. Untuk SVM didekati via softmax atas decision_function (bukan probabilitas terkalibrasi). '
                            'Sistem hanya mengklasifikasikan teks, tanpa menyimpulkan hal di luar teks.')
 
-elif menu == '📈 Dashboard Hasil':
+elif menu == 'Dashboard Hasil':
     st.header('Hasil evaluasi (data uji, 782 komentar)')
     m1, m2, m3, m4 = st.columns(4)
     m1.metric('Model Terbaik', 'SVM')
@@ -265,5 +247,4 @@ else:
 4. **Fitur**: TF-IDF unigram+bigram (`min_df=2`), fit hanya pada data latih.
 5. **Split**: stratified 80:20 (3.128 latih / 782 uji, `random_state=42`).
 6. **Model**: Naive Bayes, Logistic Regression, SVM, Random Forest, XGBoost — terbaik **SVM** (Accuracy 0,7596; F1 0,7521).
-7. **Demo web**: bila voting model menghasilkan Netral tetapi teks memuat kata kuat, label disesuaikan memakai kaidah kata yang sama dengan kaidah pelabelan (transparan, tertulis di hasil).
 ''')
