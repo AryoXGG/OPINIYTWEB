@@ -7,6 +7,7 @@ import pathlib
 import random
 import re
 import html
+from collections import Counter
 
 import joblib
 import matplotlib.pyplot as plt
@@ -166,9 +167,12 @@ if menu == '🔮 Prediksi Opini':
                 X = art['tfidf'].transform([bersih])
                 LABEL_ID = {'Positive': 'Positif', 'Negative': 'Negatif', 'Neutral': 'Netral'}
                 pred_svm = art['svm'].predict(X)[0]
-                _ps = LABEL_ID.get(pred_svm, pred_svm)
+                _labels_id = {'Positive': 'Positif', 'Negative': 'Negatif', 'Neutral': 'Netral'}
+                _votes = Counter([_labels_id.get(art[k].predict(X)[0], art[k].predict(X)[0]) for k in ['nb', 'lr', 'svm', 'rf', 'xgb']])
+                _top, _cnt = _votes.most_common(1)[0]
+                _ps = _labels_id.get(pred_svm, pred_svm)
                 cls = 'neg' if _ps == 'Negatif' else ('neu' if _ps == 'Netral' else '')
-                st.markdown(f'<div class="result-card {cls}"><b>Hasil model terbaik (SVM): {_ps}</b></div>',
+                st.markdown(f'<div class="result-card {cls}"><b>Hasil 5 model: {_top} ({_cnt}/5 sepakat)</b></div>',
                             unsafe_allow_html=True)
                 st.write('Perbandingan kelima model:')
                 hasil = []
