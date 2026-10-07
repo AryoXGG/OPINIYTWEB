@@ -113,21 +113,15 @@ INFLUENCER = pd.DataFrame([
 CONTOH = {
     'Positif': [
         'Wah makasih bang penjelasannya mantap, mencerahkan banget buat orang awam yang baru mau masuk market.',
-        'Bener banget kata lu bang, diversifikasi aset itu penting banget biar porto kita aman kalau market lagi hancur.',
-        'Konten daging semua nih! Selalu nungguin video terbarunya soal money management.',
         'Setuju 100 persen, pondasi keuangannya emang harus dari dana darurat dulu sebelum mikirin crypto.',
     ],
     'Negatif': [
         'Ah teori doang, prakteknya di market mah susah, gak segampang bacotnya.',
-        'Saham sekarang lagi hancur bang, mending jauhin dulu deh bikin boncos.',
-        'Halah ujung-ujungnya juga jualan kelas VIP, padahal ilmunya gitu-gitu aja.',
         'Gak setuju, kalau nunggu dana darurat kumpul dulu keburu telat kita ambil momentum di saham.',
     ],
     'Netral': [
         'Bang, kalau bedanya reksadana pasar uang sama pendapatan tetap itu apa ya?',
         'Next bahas tutorial cara daftar sekuritas di aplikasi dong bang.',
-        'Hadir nyimak videonya dari Surabaya bang.',
-        'Kameranya pakai apa nih bang? Gambarnya jernih banget.',
     ],
 }
 WARNA = {'Positif': '#2ca02c', 'Netral': '#1f77b4', 'Negatif': '#d62728'}
@@ -148,10 +142,12 @@ if menu == '🔮 Prediksi Opini':
     with col2:
         st.write('Contoh cepat:')
         for k in ['Positif', 'Netral', 'Negatif']:
+            ik = 'idx_' + k
+            if ik not in st.session_state:
+                st.session_state[ik] = 0
             if st.button(k, key='c_' + k):
-                st.session_state['teks'] = random.choice(CONTOH[k])
-        if st.button('Acak', key='c_acak'):
-            st.session_state['teks'] = random.choice([c for v in CONTOH.values() for c in v])
+                st.session_state['teks'] = CONTOH[k][st.session_state[ik] % len(CONTOH[k])]
+                st.session_state[ik] += 1
     with col1:
         teks = st.text_area('Tulis komentar YouTube berbahasa Indonesia:', key='teks', height=120,
                             placeholder='misal: terima kasih ilmunya sangat bermanfaat bang...')
@@ -191,8 +187,8 @@ if menu == '🔮 Prediksi Opini':
                         if key == 'svm':
                             svm_dec = dec
                             svm_cls = [LABEL_ID.get(c, c) for c in m.classes_]
-                    hasil.append((nama, LABEL_ID.get(pred, pred), round(conf, 4)))
-                df_h = pd.DataFrame(hasil, columns=['Model', 'Prediksi', 'Keyakinan'])
+                    hasil.append((nama, LABEL_ID.get(pred, pred), round(1 - conf, 4)))
+                df_h = pd.DataFrame(hasil, columns=['Model', 'Prediksi', 'Error'])
                 st.dataframe(df_h, use_container_width=True)
                 if svm_dec is not None:
                     with st.expander('Lihat skor keputusan SVM per kelas'):
@@ -201,7 +197,7 @@ if menu == '🔮 Prediksi Opini':
                         ax.set_ylabel('Skor decision_function')
                         ax.set_title('Jarak margin SVM (makin besar = makin yakin)')
                         st.pyplot(fig)
-                st.caption('*Keyakinan SVM dihitung via softmax atas decision_function (pendekatan, bukan probabilitas terkalibrasi). '
+                st.caption('*Error = 1 - keyakinan model. Untuk SVM didekati via softmax atas decision_function (bukan probabilitas terkalibrasi). '
                            'Sistem hanya mengklasifikasikan teks, tanpa menyimpulkan hal di luar teks.')
 
 elif menu == '📈 Dashboard Hasil':
