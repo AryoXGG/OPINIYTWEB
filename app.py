@@ -205,11 +205,13 @@ if menu == 'Prediksi Opini':
 
 elif menu == 'Dashboard Hasil':
     st.header('Hasil evaluasi (data uji, 782 komentar)')
-    m1, m2, m3, m4 = st.columns(4)
+    m1, m2, m3, m4, m5, m6 = st.columns(6)
     m1.metric('Model Terbaik', 'SVM')
     m2.metric('Accuracy', '0,7596')
-    m3.metric('F1-Score', '0,7521')
-    m4.metric('Data Uji', '782')
+    m3.metric('Precision', '0,7524')
+    m4.metric('Recall', '0,7596')
+    m5.metric('F1-Score', '0,7521')
+    m6.metric('Data Uji', '782')
     v1, v2, v3, v4 = st.columns(4)
     v1.metric('Total Video', '21')
     v2.metric('Leon Hartono', '10 video')
@@ -223,13 +225,36 @@ elif menu == 'Dashboard Hasil':
         ax.set_ylim(0.6, 0.82)
         ax.set_title('Accuracy')
         plt.xticks(rotation=20)
+        for i, v in enumerate(METRICS['Accuracy']):
+            ax.text(i, v + 0.005, f'{v:.4f}', ha='center', fontsize=8)
         st.pyplot(fig)
     with c2:
+        fig, ax = plt.subplots()
+        ax.bar(METRICS['Model'], METRICS['Precision'], color=['#A6A6A6'] * 4 + ['#1F3864'])
+        ax.set_ylim(0.6, 0.82)
+        ax.set_title('Precision (weighted)')
+        plt.xticks(rotation=20)
+        for i, v in enumerate(METRICS['Precision']):
+            ax.text(i, v + 0.005, f'{v:.4f}', ha='center', fontsize=8)
+        st.pyplot(fig)
+    c3, c4 = st.columns(2)
+    with c3:
+        fig, ax = plt.subplots()
+        ax.bar(METRICS['Model'], METRICS['Recall'], color=['#A6A6A6'] * 4 + ['#1F3864'])
+        ax.set_ylim(0.6, 0.82)
+        ax.set_title('Recall (weighted)')
+        plt.xticks(rotation=20)
+        for i, v in enumerate(METRICS['Recall']):
+            ax.text(i, v + 0.005, f'{v:.4f}', ha='center', fontsize=8)
+        st.pyplot(fig)
+    with c4:
         fig, ax = plt.subplots()
         ax.bar(METRICS['Model'], METRICS['F1-Score'], color=['#A6A6A6'] * 4 + ['#1F3864'])
         ax.set_ylim(0.55, 0.82)
         ax.set_title('F1-Score (weighted)')
         plt.xticks(rotation=20)
+        for i, v in enumerate(METRICS['F1-Score']):
+            ax.text(i, v + 0.005, f'{v:.4f}', ha='center', fontsize=8)
         st.pyplot(fig)
     st.subheader('Sebaran opini per influencer (n = 3.917)')
     st.dataframe(INFLUENCER, use_container_width=True)
