@@ -114,11 +114,11 @@ INFLUENCER = pd.DataFrame([
 CONTOH = {
     'Positif': [
         'Wah makasih bang penjelasannya mantap, mencerahkan banget buat orang awam yang baru mau masuk market.',
-        'Setuju 100 persen, pondasi keuangannya emang harus dari dana darurat dulu sebelum mikirin crypto.',
+        'Mantap bang, materinya bagus dan jelas banget, top markotop!',
     ],
     'Negatif': [
-        'Kontennya sesat, saya rugi besar ikut saran investasinya, kecewa berat sama influencer ini.',
-        'Jangan percaya omongan influencer keuangan ini, portofolio saya hancur gara-gara ikut sarannya.',
+        'Konten ini bohong dan menipu, saya kecewa berat sudah rugi ikut sarannya.',
+        'Bahasa dan datanya sesat serta tidak jelas, pemula seperti saya jadi rugi.',
     ],
     'Netral': [
         'Bang, kalau bedanya reksadana pasar uang sama pendapatan tetap itu apa ya?',
