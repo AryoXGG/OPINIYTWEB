@@ -117,8 +117,8 @@ CONTOH = {
         'Mantap bang, materinya bagus dan jelas banget, top markotop!',
     ],
     'Negatif': [
-        'Konten ini bohong dan menipu, saya kecewa berat sudah rugi ikut sarannya.',
-        'Bahasa dan datanya sesat serta tidak jelas, pemula seperti saya jadi rugi.',
+        'Jangan ada yang percaya bohong semua nya',
+        'pengalaman pribadi, saya udah kapok invesetasi di crypto di tipu influencer',
     ],
     'Netral': [
         'Bang, kalau bedanya reksadana pasar uang sama pendapatan tetap itu apa ya?',
