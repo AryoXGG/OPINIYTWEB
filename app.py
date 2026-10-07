@@ -113,16 +113,16 @@ INFLUENCER = pd.DataFrame([
 ], columns=['Influencer', 'Positif', 'Netral', 'Negatif', 'Total'])
 CONTOH = {
     'Positif': [
-        'Wah makasih bang penjelasannya mantap, mencerahkan banget buat orang awam yang baru mau masuk market.',
-        'Mantap bang, materinya bagus dan jelas banget, top markotop!',
+        'Makasih ko udah mau sharing soal finance gini, aku yg gk pinter ini sangat terbantu',
+        'Bagus banget hasil riset nya mantap nilai 4 untuk tim overpost',
     ],
     'Negatif': [
         'Jangan ada yang percaya bohong semua nya',
         'pengalaman pribadi, saya udah kapok invesetasi di crypto di tipu influencer',
     ],
     'Netral': [
-        'Bang, kalau bedanya reksadana pasar uang sama pendapatan tetap itu apa ya?',
-        'Next bahas tutorial cara daftar sekuritas di aplikasi dong bang.',
+        'Invest saham amerika dmn klo masih dbawah 1 milyar?',
+        'Btw sekedar ngingetin aja guys jangan lupa pakai uang dingin kalau mau investasi',
     ],
 }
 WARNA = {'Positif': '#2ca02c', 'Netral': '#1f77b4', 'Negatif': '#d62728'}
@@ -131,7 +131,7 @@ WARNA = {'Positif': '#2ca02c', 'Netral': '#1f77b4', 'Negatif': '#d62728'}
 st.markdown('''<div class="hero"><h1>Analisis Opini Audiens terhadap Influencer Keuangan</h1>
 <p>Klasifikasi opini komentar YouTube (Positif, Negatif, Netral) - Naive Bayes, Logistic Regression, SVM, Random Forest, XGBoost</p></div>''',
     unsafe_allow_html=True)
-menu = st.sidebar.radio('Navigasi', ['Prediksi Opini', 'Dashboard Hasil', 'Metodologi'])
+menu = st.sidebar.radio('Navigasi', ['Dashboard Hasil', 'Prediksi Opini'])
 if menu == 'Prediksi Opini':
     st.header('Prediksi opini komentar')
     art = load_artifacts()
@@ -210,6 +210,11 @@ elif menu == 'Dashboard Hasil':
     m2.metric('Accuracy', '0,7596')
     m3.metric('F1-Score', '0,7521')
     m4.metric('Data Uji', '782')
+    v1, v2, v3, v4 = st.columns(4)
+    v1.metric('Total Video', '21')
+    v2.metric('Leon Hartono', '10 video')
+    v3.metric('Timothy Ronald', '6 video')
+    v4.metric('Doddy Bicara Investasi', '5 video')
     st.dataframe(METRICS, use_container_width=True)
     c1, c2 = st.columns(2)
     with c1:
@@ -237,14 +242,18 @@ elif menu == 'Dashboard Hasil':
     ax.set_xticklabels(['Leon\nHartono', 'Timothy\nRonald', 'Doddy Bicara\nInvestasi'])
     ax.legend()
     st.pyplot(fig)
+    st.subheader('Contoh komentar per kelas opini')
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.success('**Positif**')
+        for t in CONTOH['Positif']:
+            st.write('- ' + t)
+    with c2:
+        st.info('**Netral**')
+        for t in CONTOH['Netral']:
+            st.write('- ' + t)
+    with c3:
+        st.error('**Negatif**')
+        for t in CONTOH['Negatif']:
+            st.write('- ' + t)
 
-else:
-    st.header('Metodologi singkat')
-    st.markdown('''
-1. **Pengumpulan**: 4.186 komentar via YouTube Data API v3 (21 video, 3 influencer).
-2. **Pelabelan**: model RoBERTa Bahasa Indonesia + penyempurnaan kaidah → 3.917 berlabel (Netral 47,5%, Positif 33,4%, Negatif 19,1%).
-3. **Prapemrosesan**: case folding → cleansing → normalisasi slang → tokenisasi → stopword removal → stemming Sastrawi.
-4. **Fitur**: TF-IDF unigram+bigram (`min_df=2`), fit hanya pada data latih.
-5. **Split**: stratified 80:20 (3.128 latih / 782 uji, `random_state=42`).
-6. **Model**: Naive Bayes, Logistic Regression, SVM, Random Forest, XGBoost — terbaik **SVM** (Accuracy 0,7596; F1 0,7521).
-''')
